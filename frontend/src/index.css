@@ -2,60 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Travel-inspired design system for global event discovery chatbot */
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
 
 @layer base {
   :root {
-    /* Travel-inspired color palette */
-    --background: 220 15% 97%;
-    --foreground: 215 25% 15%;
+    /* FestivAI Design System - Purple Gradient Theme */
+    --background: 258 31% 85%;
+    --foreground: 333 31% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 333 31% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 333 31% 18%;
 
-    /* Ocean blue primary for travel theme */
-    --primary: 210 100% 45%;
+    --primary: 258 55% 64%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 210 100% 65%;
 
-    /* Warm sunset secondary */
-    --secondary: 25 95% 55%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 270 25% 90%;
+    --secondary-foreground: 333 31% 18%;
 
-    /* Soft travel neutrals */
-    --muted: 220 15% 94%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 270 25% 95%;
+    --muted-foreground: 333 20% 55%;
 
-    /* Adventure green accent */
-    --accent: 155 60% 45%;
+    --accent: 264 45% 74%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 55%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 88%;
-    --input: 220 13% 88%;
-    --ring: 210 100% 45%;
+    --border: 270 25% 90%;
+    --input: 0 0% 100%;
+    --ring: 258 55% 64%;
 
-    /* Travel-themed gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 45%), hsl(210 100% 65%));
-    --gradient-sunset: linear-gradient(135deg, hsl(25 95% 55%), hsl(45 95% 60%));
-    --gradient-ocean: linear-gradient(180deg, hsl(210 100% 50%), hsl(195 85% 45%));
-    --gradient-adventure: linear-gradient(135deg, hsl(155 60% 45%), hsl(175 60% 50%));
-    
-    /* Elegant shadows */
-    --shadow-travel: 0 8px 32px -8px hsl(210 100% 45% / 0.2);
-    --shadow-chat: 0 4px 20px -4px hsl(215 25% 15% / 0.1);
-    --shadow-card: 0 2px 12px -2px hsl(215 25% 15% / 0.08);
+    --radius: 1rem;
 
-    /* Smooth animations */
+    /* Custom FestivAI Variables */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    --radius: 0.5rem;
+    --backdrop-blur: blur(16px);
 
     --sidebar-background: 0 0% 98%;
 
@@ -119,6 +109,54 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    background: var(--gradient-primary);
+    @apply text-foreground min-h-screen;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: var(--gradient-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: var(--backdrop-blur);
+    transition: var(--transition-smooth);
+  }
+  
+  .glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+  }
+  
+  .festival-card {
+    @apply glass-card rounded-2xl p-6 cursor-pointer;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .month-button {
+    @apply px-6 py-3 rounded-full font-medium transition-all duration-300 border border-white/30;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+  }
+  
+  .month-button.active {
+    background: rgba(255, 255, 255, 0.9);
+    color: hsl(var(--foreground));
+  }
+  
+  .month-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .ai-message {
+    @apply bg-white rounded-2xl p-4 max-w-xs shadow-lg;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .user-message {
+    @apply bg-primary text-primary-foreground rounded-2xl p-4 max-w-xs ml-auto;
   }
 }
