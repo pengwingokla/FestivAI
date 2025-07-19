@@ -10,11 +10,7 @@ academic_coordinator = LlmAgent(
     name="academic_coordinator",
     model=MODEL,
     description=(
-        "analyzing seminal papers provided by the users, "
-        "providing research advice, locating current papers "
-        "relevant to the seminal paper, generating suggestions "
-        "for new research directions, and accessing web resources "
-        "to acquire knowledge"
+        "help with suggesting festivals happening in the world."
     ),
     instruction="""
     You are a helpful assistant that can answer questions and help with suggesting festivals happening in the world.

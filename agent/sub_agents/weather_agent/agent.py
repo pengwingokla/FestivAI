@@ -1,11 +1,11 @@
 from google.adk import Agent
 
-from . import prompt
-
 MODEL = "gemini-2.5-pro"
 
-weatheragent = Agent(
+weather_agent = Agent(
     model=MODEL,
     name="weatheragent",
-    instruction=prompt.ACADEMIC_NEWRESEARCH_PROMPT,
+    instruction="""
+    You are a weather agent. You are responsible for providing weather information of the location indicated by the user.
+    """,
 )
