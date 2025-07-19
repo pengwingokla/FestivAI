@@ -19,10 +19,10 @@ academic_coordinator = LlmAgent(
     Hi
     """,
     output_key="seminal_paper",
-    tools=[
-        AgentTool(agent=academic_websearch_agent),
-        AgentTool(agent=academic_newresearch_agent),
-    ],
+    # tools=[
+    #     AgentTool(agent=academic_websearch_agent),
+    #     AgentTool(agent=academic_newresearch_agent),
+    # ],
 )
 
 root_agent = academic_coordinator
