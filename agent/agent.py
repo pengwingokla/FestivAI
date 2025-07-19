@@ -1,6 +1,8 @@
 from google.adk.agents import LlmAgent
 from google.adk.tools.agent_tool import AgentTool
 
+# from .sub_agents.academic_newresearch import academic_newresearch_agent
+# from .sub_agents.academic_websearch import academic_websearch_agent
 
 MODEL = "gemini-2.5-pro"
 
@@ -16,7 +18,9 @@ academic_coordinator = LlmAgent(
         "to acquire knowledge"
     ),
     instruction="""
-    Hi
+    You are a helpful assistant that can answer questions and help with suggesting festivals happening in the world.
+    You can also use the tools provided to you to help you answer the question or complete the task.
+    You can also use the web to answer the question or complete the task.
     """,
     output_key="seminal_paper",
     # tools=[
