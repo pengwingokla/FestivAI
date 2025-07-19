@@ -79,3 +79,4 @@ def find_best_flight(flight_data, from_city: str, from_country, to_city: str):
    response = client.models.generate_content(model=model_name, contents=[prompt])
    clean = response.text.replace("```json", "").replace("```", "").strip()
    return clean
+
