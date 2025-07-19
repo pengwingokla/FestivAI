@@ -22,19 +22,19 @@ def get_user_location():
       response = requests.get("https://ipinfo.io/json")
       data = response.json()
       city = data.get("city", "")
+      region = data.get("region", "")
       country = data.get("country", "")
-      airport_code = data.get("airport", "")  # Might not always exist
-      return city, country
+      return city, region, country
    except Exception as e:
-      return "", ""
+      return "", "", ""
 
-def get_date():
-   return (datetime.now() + relativedelta(months=2)).strftime("%Y-%m-%d")
+def get_date(offset: int = 0):
+   return (datetime.now() + relativedelta(months=offset)).strftime("%Y-%m-%d")
 
 # === Step 2: Generate Google Flights URL ===
-def get_flight_url(from_city: str, to_city: str):
+def get_flight_url(from_city: str, from_state: str, to_city: str):
    date = get_date()
-   return f"https://www.google.com/travel/flights?q=oneway%20flights%20from%20{quote_plus(from_city)}%20to%20{quote_plus(to_city)}%20on%20{date}"
+   return f"https://www.google.com/travel/flights?q=oneway%20flights%20from%20{quote_plus(from_city)}%20{quote_plus(from_state)}%20to%20{quote_plus(to_city)}%20on%20{date}"
 
 # === Step 3: Scrape flight data from Google Flights ===
 def scrape_website_data(url):
@@ -45,12 +45,10 @@ def scrape_website_data(url):
       heading_tag = soup.find('h3', string='Top flights')
 
       if not heading_tag:
-         # print("Could not find the 'Top flights' heading.")
          return []
         
       ul_element = heading_tag.find_next_sibling('ul')
       if not ul_element:
-         # print("Found the heading, but could not find the corresponding list (ul).")
          return []
         
       flight_info = [li.get_text(separator=' ', strip=True) for li in ul_element.find_all('li')]
@@ -58,11 +56,10 @@ def scrape_website_data(url):
    except:
       return []
 
-# === Step 3: Ask AI agent to extract ticket info ===
+# === Step 4: Ask AI agent to extract ticket info ===
 def find_best_flight(flight_data, from_city: str, from_country, to_city: str):
    # url = get_flight_url(from_city, to_city)
    # print(f"\n🌐 Searching: {url}\n")
-   # website_data = scrape_website_data(url)
 
    prompt = (
       "You are a travel assistant. Analyze the following flight ticket data from a Google Flights page:\n"
@@ -72,7 +69,7 @@ def find_best_flight(flight_data, from_city: str, from_country, to_city: str):
       "Each key should map to an object with airline, price, duration, and departure.\n"
       "Example:\n"
       '{\n'
-      '  "flight_1": {"airline": "...", "price": "...", "duration": "...", "departure": "..."},\n'
+      '  "flight_1": {"airline": "Vietnam Airlines", "price": "$900", "duration": "26 hr 15 min", "departure": "Sat, Sep 20, 11:25 AM"},\n'
       '  "flight_2": {...},\n'
       '  "flight_3": {...}\n'
       '}\n'
