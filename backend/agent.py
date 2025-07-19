@@ -1,8 +1,7 @@
 from google.adk.agents import LlmAgent
 from google.adk.tools.agent_tool import AgentTool
 
-# from .sub_agents.academic_newresearch import academic_newresearch_agent
-# from .sub_agents.academic_websearch import academic_websearch_agent
+from .sub_agents.weather_agent import weather_agent
 
 MODEL = "gemini-2.5-pro"
 
@@ -23,10 +22,9 @@ academic_coordinator = LlmAgent(
     You can also use the web to answer the question or complete the task.
     """,
     output_key="seminal_paper",
-    # tools=[
-    #     AgentTool(agent=academic_websearch_agent),
-    #     AgentTool(agent=academic_newresearch_agent),
-    # ],
+    tools=[
+        AgentTool(agent=weather_agent),
+    ],
 )
 
 root_agent = academic_coordinator
