@@ -1,89 +1,92 @@
 import os
-import requests
-from datetime import datetime
 from dotenv import load_dotenv
-from google import genai
-from google.genai.types import HttpOptions
+from google.adk import Agent
+from google.adk.sessions import InMemorySessionService
+from google.adk.runners import Runner
+from google.genai import types
+import json
+import asyncio
 
 load_dotenv()
 
-api_key = os.getenv("GOOGLE_API_KEY")
-cloud_run_url = os.getenv("CLOUD_RUN_URL")
-model_name = os.getenv("AGENT_MODEL")
+# === Agentic Weather Assistant Configuration ===
+MODEL = os.getenv("AGENT_MODEL", "gemini-2.0-flash-exp")
 
-client = genai.Client(api_key=api_key, http_options=HttpOptions(base_url=cloud_run_url))
+weather_agent = Agent(
+    model=MODEL,
+    name="weather_agent",
+    instruction="""
+You are a weather assistant. When I give you a city name, provide current weather information for that city and respond _only_ with a JSON object that has exactly these keys:
+{
+  "temperature": "temperature with unit (e.g., '22°C' or '72°F')",
+  "conditions": "brief weather description (e.g., 'Sunny', 'Partly cloudy', 'Rainy')",
+  "recommendations": "brief clothing or activity recommendations based on weather"
+}
+Do not wrap it in markdown code blocks. Return only valid JSON without any additional text or formatting.
+"""
+)
 
-# === Step 1: Detect user location based on IP ===
-def get_user_location():
-   try:
-      response = requests.get("https://ipinfo.io/json")
-      data = response.json()
-      city = data.get("city", "")
-      country = data.get("country", "")
-      return city, country
-   except Exception as e:
-      return "", ""
+# Setup session service and runner
+_session_service = InMemorySessionService()
+_runner = Runner(
+    agent=weather_agent,
+    app_name="weather_agent_app",
+    session_service=_session_service,
+)
 
-# === Step 2: Get weather data from OpenWeatherMap API ===
-def get_weather_data(city: str, country: str):
-   try:
-      api_key = os.getenv("OPENWEATHER_API_KEY")
-      if not api_key:
-         return None
-      
-      # Get coordinates first
-      geocode_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city},{country}&limit=1&appid={api_key}"
-      geocode_response = requests.get(geocode_url)
-      geocode_data = geocode_response.json()
-      
-      if not geocode_data:
-         return None
-      
-      lat = geocode_data[0]["lat"]
-      lon = geocode_data[0]["lon"]
-      
-      # Get weather data
-      weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric"
-      weather_response = requests.get(weather_url)
-      weather_data = weather_response.json()
-      
-      return weather_data
-   except Exception as e:
-      return None
+def _ensure_session(user_id: str, session_id: str):
+    import concurrent.futures
+    
+    def create_session():
+        return asyncio.run(
+            _session_service.create_session(
+                app_name="weather_agent_app",
+                user_id=user_id,
+                session_id=session_id,
+            )
+        )
+    
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future = executor.submit(create_session)
+        future.result()
 
-# === Step 3: Ask AI agent to format weather information ===
-def format_weather_info(weather_data, city: str, country: str):
-   if not weather_data:
-      return "Unable to retrieve weather data for the specified location."
-   
-   prompt = (
-      f"You are a weather assistant. Analyze the following weather data for {city}, {country}:\n"
-      f"Temperature: {weather_data.get('main', {}).get('temp', 'N/A')}°C\n"
-      f"Feels like: {weather_data.get('main', {}).get('feels_like', 'N/A')}°C\n"
-      f"Humidity: {weather_data.get('main', {}).get('humidity', 'N/A')}%\n"
-      f"Weather description: {weather_data.get('weather', [{}])[0].get('description', 'N/A')}\n"
-      f"Wind speed: {weather_data.get('wind', {}).get('speed', 'N/A')} m/s\n"
-      f"Pressure: {weather_data.get('main', {}).get('pressure', 'N/A')} hPa\n"
-      f"Visibility: {weather_data.get('visibility', 'N/A')} meters\n"
-      f"Sunrise: {datetime.fromtimestamp(weather_data.get('sys', {}).get('sunrise', 0)).strftime('%H:%M')}\n"
-      f"Sunset: {datetime.fromtimestamp(weather_data.get('sys', {}).get('sunset', 0)).strftime('%H:%M')}\n\n"
-      "Provide a friendly, informative weather summary in a conversational tone. "
-      "Include recommendations for clothing or activities based on the weather conditions. "
-      "Keep it concise but helpful."
-   )
-
-   response = client.models.generate_content(model=model_name, contents=[prompt])
-   return response.text.strip()
-
-def get_weather_for_location(city: str = None, country: str = None):
-   """
-   Main function to get weather information for a location.
-   If no location is provided, it will use the user's detected location.
-   """
-   if not city or not country:
-      city, country = get_user_location()
-      if not city or not country:
-         return "Unable to determine your location. Please provide a city and country."
-   
-   weather_data = get_weather_data(city, country)
-   return format_weather_info(weather_data, city, country)
+def get_weather_for_location(city: str):
+    content = types.Content(parts=[types.Part(text=f"Get current weather for {city}")])
+    
+    session_id = f"weather_{city}"
+    user_id = "weather_user"
+    _ensure_session(user_id, session_id)
+    
+    events = _runner.run(user_id=user_id, session_id=session_id, new_message=content)
+    
+    for ev in events:
+        if ev.is_final_response():
+            text = ev.content.parts[0].text.strip()
+            print(f"Agent response: '{text}'")  # Debug print
+            
+            if not text:
+                print("Empty response from agent")
+                return {
+                    "temperature": "20°C",
+                    "conditions": "Unknown",
+                    "recommendations": "Check local weather"
+                }
+            
+            # Remove markdown code blocks if present
+            if text.startswith('```json'):
+                text = text.replace('```json', '').replace('```', '').strip()
+            elif text.startswith('```'):
+                text = text.replace('```', '').strip()
+            
+            return json.loads(text)
+    
+    # No final response found
+    print("No final response from agent")
+    return {
+        "temperature": "20°C",
+        "conditions": "Unknown",
+        "humidity": "50%",
+        "uv_index": "5",
+        "air_quality": "Good",
+        "recommendations": "Check local weather"
+    }

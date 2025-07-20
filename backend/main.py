@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sub_agents import *
-from models import FlightRequest, FlightOption, FlightResponseDict
+from models import FlightRequest, FlightOption, FlightResponseDict, WeatherRequest, WeatherResponse, WeatherInfo
 import json
+from datetime import datetime
 
 app = FastAPI()
 
@@ -37,4 +38,21 @@ def find_flights_get(to_city: str):
     except:
         print("Error parsing AI response.")
         return []
+
+
+@app.get("/api/get-weather/{city}", response_model=WeatherResponse)
+def get_weather(city: str):
+    # Get weather information
+    weather_info = weather_agent.get_weather_for_location(city)
+    print("Weather Response:", weather_info)
+
+    # Create a structured response that matches WeatherResponse model
+    response_data = {
+        "location": f"{city}",
+        "weather": WeatherInfo(**weather_info),  # Convert dict to WeatherInfo object
+        "timestamp": datetime.now().isoformat()
+    }
+
+    return response_data
+    
 
