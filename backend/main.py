@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sub_agents import *
-from models import FlightRequest, FlightOption
+from models import FlightRequest, FlightOption, FlightResponseDict
 import json
 
 app = FastAPI()
@@ -15,23 +15,26 @@ app.add_middleware(
 )
 
 
-@app.post("/api/find-flights", response_model=list[FlightOption])
-def find_flights(req: FlightRequest):
+@app.get("/api/find-flights/{to_city}", response_model=FlightResponseDict)
+def find_flights_get(to_city: str):
+    from sub_agents import flight_agent
+
     from_city, from_country = flight_agent.get_user_location()
     if not from_city:
         return []
 
-    url = flight_agent.get_flight_url(from_city, req.to_city)
+    url = flight_agent.get_flight_url(from_city, to_city)
     raw_data = flight_agent.scrape_website_data(url)
 
     if not raw_data:
         return []
 
-    genai_response = flight_agent.find_best_flight(raw_data, from_city, from_country, req.to_city)
+    genai_response = flight_agent.find_best_flight(raw_data, from_city, from_country, to_city)
+    print("AI Response:", genai_response)
 
     try:
-        parsed = json.loads(genai_response)
-        return parsed
-    except Exception:
-        print("⚠️ Failed to parse model output:", genai_response)
+        return json.loads(genai_response)
+    except:
+        print("Error parsing AI response.")
         return []
+
