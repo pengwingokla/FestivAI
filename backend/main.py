@@ -9,7 +9,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://192.168.1.143:8080"],  # React dev server
+    allow_origins=["http://localhost:8080"],  # React dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -78,3 +78,15 @@ def get_weather(city: str):
     }
 
     return response_data
+
+@app.get("/api/get-weather-full-response/{city}")
+def get_weather_full_response(city: str):
+    weather_info = get_weather(city)
+
+    # Format a textual summary
+    lines = [f"🌍 Weather for {weather_info['location']}:"]
+    lines.append(f"🌡️ Temperature: {weather_info['weather'].temperature}")
+    lines.append(f"📝 Conditions: {weather_info['weather'].conditions}")
+    lines.append(f"📝 Recommendations: {weather_info['weather'].recommendations}")
+
+    return {"response": "\n".join(lines)}

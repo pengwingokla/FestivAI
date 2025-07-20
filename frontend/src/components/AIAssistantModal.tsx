@@ -94,25 +94,28 @@ export const AIAssistantModal = ({ festival, isOpen, onClose }: AIAssistantModal
           aiResponse = "Oops! Something went wrong while fetching flight info.";
           console.error("Flight fetch error:", error);
         }
-      } else if (userMessage.toLowerCase().includes("hotel") || userMessage.toLowerCase().includes("accommodation")) {
-        aiResponse = `I've found some great accommodation options near ${festival.name}:
-🏨 **Luxury Option:** Grand Festival Hotel - $200/night (0.5km from venue)
-🏨 **Mid-range:** City Center Inn - $120/night (1.2km from venue)
-🏨 **Budget:** Backpacker's Lodge - $45/night (2km from venue)
+      } 
+      else if (userMessage.toLowerCase().includes("weather") || userMessage.toLowerCase().includes("forecast")) {
+        try {
+          const res = await fetch(`http://127.0.0.1:8080/api/get-weather-full-response/${festival.city.toLowerCase()}`);
+          const data = await res.json();
 
-All options include breakfast and are highly rated by festival-goers!`;
+          if (data.response) {
+            aiResponse = data.response;
+          } else {
+            aiResponse = `Sorry, I couldn't find any weather details to ${festival.city} right now.`;
+          }
+        } catch (error) {
+          aiResponse = "Oops! Something went wrong while fetching weather info.";
+          console.error("Flight fetch error:", error);
+        }
+      }
+      else if (userMessage.toLowerCase().includes("hotel") || userMessage.toLowerCase().includes("accommodation")) {
+        aiResponse = `Feature not available yet.`;
       } else if (userMessage.toLowerCase().includes("visa") || userMessage.toLowerCase().includes("requirement")) {
-        aiResponse = `For traveling to ${festival.country}, here are the entry requirements:
-📋 **Visa Requirements:** Tourist visa required (can be obtained online)
-📄 **Documents:** Valid passport (6+ months remaining)
-💰 **Duration:** Up to 30 days tourist stay
-⏰ **Processing:** 3-5 business days for e-visa
-
-I can help you with the application process if needed!`;
+        aiResponse = `Feature not available yet.`;
       } else {
-        aiResponse = `That's a great question about ${festival.name}! Let me help you with that. The festival is known for ${festival.highlights.join(", ").toLowerCase()} and offers an incredible cultural experience. 
-
-Would you like me to provide more specific information about flights, accommodations, weather conditions, or help you create a detailed itinerary?`;
+        aiResponse = `That's a great question about ${festival.name}! The festival is known for ${festival.highlights.join(", ").toLowerCase()} and offers an incredible cultural experience. Would you like me to provide more specific information about flights, accommodations, weather conditions, or help you create a detailed itinerary?`;
       }
       
       addMessage(aiResponse, true);
@@ -146,59 +149,27 @@ Would you like me to provide more specific information about flights, accommodat
           break;
           
         case "hotels":
-          response = `🏨 **Accommodation Recommendations near ${festival.name}:**
-
-🌟 **Premium (0-1km):** $180-300/night
-- Festival View Hotel ⭐⭐⭐⭐⭐
-- Cultural Heritage Inn ⭐⭐⭐⭐⭐
-
-🏙️ **Mid-range (1-3km):** $80-150/night  
-- City Plaza Hotel ⭐⭐⭐⭐
-- Modern Comfort Suites ⭐⭐⭐⭐
-
-💰 **Budget (3-5km):** $25-60/night
-- Traveler's Hostel ⭐⭐⭐
-- Local Guest House ⭐⭐⭐
-
-All include free WiFi and breakfast! Which price range interests you?`;
+          // Scale in the future
           break;
           
         case "weather":
-          response = `🌤️ **Weather Forecast for ${festival.name}:**
+          try {
+            const res = await fetch(`http://127.0.0.1:8080/api/get-weather-full-response/${festival.city}`);
+            const data = await res.json();
 
-📅 **Festival Dates:** ${festival.date}
-🌡️ **Temperature:** 18-24°C (64-75°F)
-☀️ **Conditions:** Partly cloudy with sunshine
-🌧️ **Rain Chance:** 20% (brief showers possible)
-💨 **Wind:** Light breeze, perfect for outdoor events
-
-👕 **Packing Recommendations:**
-- Light layers (t-shirt + light jacket)
-- Sun hat and sunscreen
-- Camera for amazing photos!
-
-Perfect festival weather! 🎉`;
+            if (data.response) {
+              response = data.response;
+            } else {
+              response = `Sorry, I couldn't find any flight details to ${festival.city} right now.`;
+            }
+          } catch (error) {
+            response = "Oops! Something went wrong while fetching flight info.";
+            console.error("Flight fetch error:", error);
+          }
           break;
           
         case "itinerary":
-          response = `📅 **Your ${festival.name} Itinerary:**
-
-🛫 **Day 1 - Arrival:**
-- Land in ${festival.country}
-- Early dinner and rest
-
-🎉 **Day 2-3 - Festival Days:**
-- ${festival.highlights[0]}
-- ${festival.highlights[1]} 
-- ${festival.highlights[2]}
-- Evening cultural shows
-
-✈️ **Day 4 - Departure:**
-- Morning souvenir shopping
-- Local cuisine experience
-- Departure
-
-Would you like me to add specific times, restaurant recommendations, or extend your stay?`;
+          // Scale in the future
           break;
       }
       
