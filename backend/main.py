@@ -68,7 +68,7 @@ def get_flights_full_response(to_city: str):
 def get_weather(city: str):
     # Get weather information
     weather_info = weather_agent.get_weather_for_location(city)
-    print("Weather Response:", weather_info)
+    print("esponse:", weather_info)
 
     # Create a structured response that matches WeatherResponse model
     response_data = {

@@ -28,7 +28,7 @@ const Index = () => {
           🌍 FestivAI
         </h1>
         <p className="text-xl text-white/90 max-w-2xl mx-auto">
-          Discover Global Festivals & Let AI Plan Your Journey
+          Discover Global Festivals & Let FestivAI Plan Your Journey
         </p>
       </div>
 
