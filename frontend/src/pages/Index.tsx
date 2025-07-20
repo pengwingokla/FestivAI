@@ -4,7 +4,7 @@ import { FestivalCard } from "@/components/FestivalCard";
 import { AIAssistantModal } from "@/components/AIAssistantModal";
 
 const Index = () => {
-  const [selectedMonth, setSelectedMonth] = useState('march');
+  const [selectedMonth, setSelectedMonth] = useState("july");
   const [selectedFestival, setSelectedFestival] = useState<Festival | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
