@@ -9,7 +9,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://10.4.33.184:8080"],  # React dev server
+    allow_origins=["http://192.168.1.143:8080"],  # React dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -18,27 +18,51 @@ app.add_middleware(
 
 @app.get("/api/find-flights/{to_city}", response_model=FlightResponseDict)
 def find_flights_get(to_city: str):
-    from sub_agents import flight_agent
-
-    from_city, from_country = flight_agent.get_user_location()
+    from_city, from_state, from_country = flight_agent.get_user_location()
     if not from_city:
         return []
 
-    url = flight_agent.get_flight_url(from_city, to_city)
+    url = flight_agent.get_flight_url(from_city, from_state, to_city)
     raw_data = flight_agent.scrape_website_data(url)
 
     if not raw_data:
         return []
 
     genai_response = flight_agent.find_best_flight(raw_data, from_city, from_country, to_city)
-    print("AI Response:", genai_response)
 
     try:
         return json.loads(genai_response)
     except:
         print("Error parsing AI response.")
         return []
+    
+@app.get("/api/get-flights-full-response/{to_city}")
+def get_flights_full_response(to_city: str):
+    # Detect user location
+    from_city, from_state, from_country = flight_agent.get_user_location()
+    if not from_city:
+        return {"response": "Sorry, I couldn't detect your location."}
 
+    cheapest_flights = find_flights_get(to_city)
+    if not cheapest_flights:
+        return {"response": f"Sorry, I couldn't find any flights to {to_city} right now."}
+
+    # Format the summary
+    if from_state:
+        from_location = f"{from_city}, {from_state}"
+    lines = [
+        f"🛫 Here are the best flights from {from_location} to {to_city} for around {flight_agent.get_date()}:"
+    ]
+
+    for i, (key, flight) in enumerate(cheapest_flights.items(), 1):
+        lines.append(
+            f"{i}. {flight['airline']} | {flight['price']} | {flight['duration']} | Depart: {flight['departure']}"
+        )
+
+    lines.append("\n✈️ Let me know if you'd like help booking, or want to compare return flights too!")
+
+    return {"response": "\n".join(lines)}
+    
 
 @app.get("/api/get-weather/{city}", response_model=WeatherResponse)
 def get_weather(city: str):
@@ -54,6 +78,3 @@ def get_weather(city: str):
     }
 
     return response_data
-    
-
-

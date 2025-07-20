@@ -29,7 +29,7 @@ export const AIAssistantModal = ({ festival, isOpen, onClose }: AIAssistantModal
         setMessages([
           {
             id: "welcome",
-            text: `Hi there! 👋 I'm your AI travel assistant, excited to help you plan your trip to ${festival.name} in ${festival.location}! I can help you with flights, accommodations, weather info, and creating the perfect itinerary. What would you like to know first?`,
+            text: `Hello 👋 I'm FestivAI travel assistant, excited to help you plan your trip to ${festival.name} in ${festival.country}! I can help you with flights, accommodations, and weather info. What would you like to know first?`,
             isAI: true,
             timestamp: new Date()
           }
@@ -45,7 +45,7 @@ export const AIAssistantModal = ({ festival, isOpen, onClose }: AIAssistantModal
   // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         onClose();
       }
     };
@@ -75,25 +75,25 @@ export const AIAssistantModal = ({ festival, isOpen, onClose }: AIAssistantModal
     setIsLoading(true);
 
     // Simulate AI thinking
-    setTimeout(() => {
+    setTimeout(async () => {
       let aiResponse = "";
       
       if (userMessage.toLowerCase().includes("flight") || userMessage.toLowerCase().includes("fly")) {
-        aiResponse = `Great! I found several flight options to ${festival.location}:
-✈️ **Option 1:** Direct flight - $850 (8h 30m)
-✈️ **Option 2:** 1 stop - $650 (12h 15m)
-✈️ **Option 3:** Budget option - $450 (18h 45m)
+        try {
+          let destination = `${festival.city}-${festival.country}`;
+          if (festival.state) destination = `${festival.city}-${festival.state}`;
+          const res = await fetch(`http://127.0.0.1:8080/api/get-flights-full-response/${destination}`);
+          const data = await res.json();
 
-Would you like me to check availability and help you book any of these options?`;
-      } else if (userMessage.toLowerCase().includes("weather")) {
-        aiResponse = `Here's the weather forecast for ${festival.name} in ${festival.location}:
-🌤️ **Expected Temperature:** 18-24°C (64-75°F)
-☀️ **Conditions:** Partly cloudy with occasional sunshine
-🌧️ **Precipitation:** 20% chance of light rain
-💨 **Wind:** Light breeze, 10-15 km/h
-👕 **What to Pack:** Light layers, comfortable shoes, light rain jacket
-
-Perfect weather for outdoor festival activities!`;
+          if (data.response) {
+            aiResponse = data.response;
+          } else {
+            aiResponse = `Sorry, I couldn't find any flight details to ${festival.city}, ${festival.country} right now.`;
+          }
+        } catch (error) {
+          aiResponse = "Oops! Something went wrong while fetching flight info.";
+          console.error("Flight fetch error:", error);
+        }
       } else if (userMessage.toLowerCase().includes("hotel") || userMessage.toLowerCase().includes("accommodation")) {
         aiResponse = `I've found some great accommodation options near ${festival.name}:
 🏨 **Luxury Option:** Grand Festival Hotel - $200/night (0.5km from venue)
@@ -102,10 +102,9 @@ Perfect weather for outdoor festival activities!`;
 
 All options include breakfast and are highly rated by festival-goers!`;
       } else if (userMessage.toLowerCase().includes("visa") || userMessage.toLowerCase().includes("requirement")) {
-        aiResponse = `For traveling to ${festival.location}, here are the entry requirements:
+        aiResponse = `For traveling to ${festival.country}, here are the entry requirements:
 📋 **Visa Requirements:** Tourist visa required (can be obtained online)
 📄 **Documents:** Valid passport (6+ months remaining)
-💉 **Health:** No special vaccinations required
 💰 **Duration:** Up to 30 days tourist stay
 ⏰ **Processing:** 3-5 business days for e-visa
 
@@ -124,22 +123,26 @@ Would you like me to provide more specific information about flights, accommodat
   const handleQuickAction = async (action: string) => {
     setIsLoading(true);
     
-    setTimeout(() => {
+    setTimeout(async () => {
       let response = "";
       
       switch (action) {
         case "flights":
-          response = `🛫 **Flight Search Results for ${festival.location}:**
+          try {
+            let destination = `${festival.city}-${festival.country}`;
+            if (festival.state) destination = `${festival.city}-${festival.state}`;
+            const res = await fetch(`http://127.0.0.1:8080/api/get-flights-full-response/${destination}`);
+            const data = await res.json();
 
-✈️ **Direct flights:** $850-1,200 (8-10 hours)
-✈️ **1-stop flights:** $650-950 (12-16 hours)  
-✈️ **Budget options:** $450-650 (18-24 hours)
-
-**Best deals departing:** 3 days before festival
-**Return flights:** Up to 40% cheaper midweek
-**Airlines:** Major carriers with good reviews
-
-Would you like me to check specific dates or help with booking?`;
+            if (data.response) {
+              response = data.response;
+            } else {
+              response = `Sorry, I couldn't find any flight details to ${festival.city}, ${festival.country} right now.`;
+            }
+          } catch (error) {
+            response = "Oops! Something went wrong while fetching flight info.";
+            console.error("Flight fetch error:", error);
+          }
           break;
           
         case "hotels":
@@ -171,8 +174,6 @@ All include free WiFi and breakfast! Which price range interests you?`;
 
 👕 **Packing Recommendations:**
 - Light layers (t-shirt + light jacket)
-- Comfortable walking shoes
-- Light rain jacket/umbrella
 - Sun hat and sunscreen
 - Camera for amazing photos!
 
@@ -183,9 +184,7 @@ Perfect festival weather! 🎉`;
           response = `📅 **Your ${festival.name} Itinerary:**
 
 🛫 **Day 1 - Arrival:**
-- Land in ${festival.location}
-- Check into hotel
-- Explore local neighborhood
+- Land in ${festival.country}
 - Early dinner and rest
 
 🎉 **Day 2-3 - Festival Days:**
@@ -235,7 +234,7 @@ Would you like me to add specific times, restaurant recommendations, or extend y
             </div>
             <div>
               <h2 className="text-2xl font-bold">AI Travel Assistant</h2>
-              <p className="text-white/90">Planning your trip to {festival.name} in {festival.location}</p>
+              <p className="text-white/90">Planning your trip to {festival.name} in {festival.country}</p>
             </div>
           </div>
         </div>
