@@ -65,13 +65,20 @@ def find_best_flight(flight_data, from_city: str, from_country, to_city: str):
    # website_data = scrape_website_data(url)
 
    prompt = (
-      f"Given flight ticket data from Google Flights page:\n"
-      f"{chr(10).join(f'- {flight}' for flight in flight_data)}\n\n"
-      f"Find the top 3 cheapest one-way flight tickets from {from_city} ({from_country}) to {to_city} on {get_date()}.\n"
-      f"Include airline, price, duration, and departure date.\n"
-      f"Respond in JSON format like: "
-      f"[{{'airline': ..., 'price': ..., 'duration': ..., 'departure': ...}}, ...]"
+      "You are a travel assistant. Analyze the following flight ticket data from a Google Flights page:\n"
+      + "\n".join(f"- {flight}" for flight in flight_data)
+      + f"\n\nFind the top 3 cheapest flight tickets from {from_city}, {from_country} to {to_city} on {get_date()}.\n"
+      "Respond in **pure JSON object format** with keys flight_1, flight_2, and flight_3.\n"
+      "Each key should map to an object with airline, price, duration, and departure.\n"
+      "Example:\n"
+      '{\n'
+      '  "flight_1": {"airline": "...", "price": "...", "duration": "...", "departure": "..."},\n'
+      '  "flight_2": {...},\n'
+      '  "flight_3": {...}\n'
+      '}\n'
+      "Do not include markdown, triple backticks, or any explanatory text—return only the JSON object."
    )
 
    response = client.models.generate_content(model=model_name, contents=[prompt])
-   return response.text
+   clean = response.text.replace("```json", "").replace("```", "").strip()
+   return clean

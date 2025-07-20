@@ -8,3 +8,8 @@ class FlightOption(BaseModel):
     price: str
     duration: str
     departure: str
+
+class FlightResponseDict(BaseModel):
+    flight_1: FlightOption
+    flight_2: FlightOption
+    flight_3: FlightOption
