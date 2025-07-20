@@ -74,7 +74,7 @@ def get_weather_for_location(city: str):
             
             # Remove markdown code blocks if present
             if text.startswith('```json'):
-                text = text.replace('```json', '').replace('```', '').strip()
+                text = text.replace('```json', '').replace('```', '')
             elif text.startswith('```'):
                 text = text.replace('```', '').strip()
             
