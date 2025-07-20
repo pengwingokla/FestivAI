@@ -12,7 +12,7 @@ export const FestivalCard = ({ festival, onClick }: FestivalCardProps) => {
         <span className="text-4xl">{festival.flag}</span>
         <div>
           <h3 className="text-xl font-bold text-foreground">{festival.name}</h3>
-          <p className="text-muted-foreground">{festival.location}</p>
+          <p className="text-muted-foreground">{festival.country}</p>
         </div>
       </div>
       
