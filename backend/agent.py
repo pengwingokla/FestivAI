@@ -6,8 +6,8 @@ from .sub_agents.weather_agent import weather_agent
 MODEL = "gemini-2.5-pro"
 
 
-academic_coordinator = LlmAgent(
-    name="academic_coordinator",
+main_agent = LlmAgent(
+    name="main_agent",
     model=MODEL,
     description=(
         "help with suggesting festivals happening in the world."
@@ -23,4 +23,4 @@ academic_coordinator = LlmAgent(
     ],
 )
 
-root_agent = academic_coordinator
+root_agent = main_agent
