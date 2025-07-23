@@ -149,7 +149,7 @@ export const AIAssistantModal = ({ festival, isOpen, onClose }: AIAssistantModal
           break;
           
         case "hotels":
-          // Scale in the future
+          response = `Feature not available yet.`;
           break;
           
         case "weather":
@@ -169,7 +169,7 @@ export const AIAssistantModal = ({ festival, isOpen, onClose }: AIAssistantModal
           break;
           
         case "itinerary":
-          // Scale in the future
+          response = `Feature not available yet.`;
           break;
       }
       
