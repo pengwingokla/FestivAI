@@ -6,6 +6,10 @@ An AI-powered application for creating personalized festival and greeting conten
 
 FestivAI leverages artificial intelligence to generate customized festival greetings, cards, and celebratory content. The application is built using Google Cloud services and provides a scalable solution for personalized content generation.
 
+## Demo Video
+Watch the complete demo and walkthrough of FestivAI:
+[![FestivAI Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+
 ## Architecture
 
 The project utilizes several Google Cloud Platform services:
