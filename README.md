@@ -1,6 +1,6 @@
 # FestivAI
 
-An AI-powered application for creating personalized festival and greeting content, deployed on Google Cloud Platform.
+![architecture](frontend/public/uml-diagram.png)
 
 ## Overview
 
