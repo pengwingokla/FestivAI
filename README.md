@@ -150,4 +150,5 @@ The application includes:
 - TypeScript
 - Gemini 2.5 Pro
 - Gemma 3
-- NVIDIA
+- GCP (Cloud Run)
+- NVIDIA L4 GPU
