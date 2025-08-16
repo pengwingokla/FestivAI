@@ -4,29 +4,18 @@
 
 ## Overview
 
-FestivAI leverages artificial intelligence to generate customized festival greetings, cards, and celebratory content. The application is built using Google Cloud services and provides a scalable solution for personalized content generation.
+FestivAI is a multi-agent AI application that generates itineraries to global festivals and countries from users' abstract and concrete prompts.
 
 ## Demo Video
 Watch the complete demo and walkthrough of FestivAI:
 [![FestivAI Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
-## Architecture
-
-The project utilizes several Google Cloud Platform services:
-
-- **AI Platform**: For machine learning model deployment and inference
-- **Cloud Run**: Serverless container deployment for scalable web services
-- **Cloud Build**: Automated CI/CD pipeline for building and deploying applications
-- **Container Registry**: Docker image storage and management
-
 ## Prerequisites
 
-Before setting up the project, ensure you have:
-
-- Google Cloud SDK installed and configured
-- Docker installed (for containerized deployment)
-- Python 3.8+ (if running locally)
-- A Google Cloud Project with billing enabled
+- Google Cloud SDK
+- Google Cloud Project (GCP) credits
+- Python 3.8+
+- Node.js
 
 ## Setup Instructions
 
@@ -134,14 +123,6 @@ Key configuration parameters:
 - `MODEL_NAME`: AI model identifier
 - `MAX_CONTENT_LENGTH`: Maximum content length for generation
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## Environment Variables
 
 Required environment variables:
@@ -162,42 +143,11 @@ The application includes:
 - Error tracking and alerting
 - Custom metrics for content generation statistics
 
-## Security
+## Technologies
 
-- All API endpoints are secured with authentication
-- Data encryption in transit and at rest
-- Regular security updates and vulnerability scanning
-- Compliance with data protection regulations
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication Errors**
-   - Ensure you're logged in: `gcloud auth login`
-   - Check project configuration: `gcloud config get-value project`
-
-2. **Deployment Failures**
-   - Verify all required APIs are enabled
-   - Check IAM permissions for Cloud Build and Cloud Run
-
-3. **Model Errors**
-   - Ensure AI Platform models are properly deployed
-   - Check model endpoint configuration
-
-## Support
-
-For support and questions:
-
-- Create an issue in the GitHub repository
-- Check the troubleshooting section
-- Review Google Cloud documentation
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Google Cloud Platform for infrastructure
-- Open source AI
+- Python
+- React
+- TypeScript
+- Gemini 2.5 Pro
+- Gemma 3
+- NVIDIA
